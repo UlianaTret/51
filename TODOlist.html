@@ -1,0 +1,131 @@
+<html>
+<head>
+    <title>TO DO list</title>
+    <style type="text/css">
+        body
+        {
+            font-family: Lucida Console;
+        }
+        a.del
+        {
+            margin-left: -120px;
+            color: Red;
+        }
+        a.btn-common
+        {
+            color: #4B0082;
+        }
+        li.task
+        {
+            cursor: default;
+            margin-left: 80px;
+        }
+        li.task span
+        {
+            margin-left: 70px;
+        }
+    </style>
+
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.6.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/jquery-ui.min.js"></script>
+    <script type="text/javascript">
+        function saveState() {
+            var notReady = [];
+            var ready = [];
+
+            $('#list-not-ready li.task span').each(function (i, el) {
+                var val = escape($(el).text());
+                notReady.push(val);
+            });
+            var result = notReady.join('&') + '|' + ready.join('&');
+            var time = new Date();
+            time.setTime(time.getTime() + 2678400000);
+            document.cookie = 'data=' + result + "; expires=" + time.toGMTString();
+        }
+
+        function loadState() {
+            var addList = function (strList, isComplete) {
+                var list = strList.split('&');
+                for (var i = 0; i < list.length; i++) {
+                    if (list[i]) {
+                        addTask(unescape(list[i]), isComplete);
+                    }
+                }
+            }
+            var getCookie = function (name) {
+                var cSIndex = document.cookie.indexOf(name);
+                if (cSIndex == -1) {
+                    return ''
+                };
+
+                cSIndex = document.cookie.indexOf(name + "=")
+                if (cSIndex == -1) {
+                    return ''
+                };
+
+                var cEIndex = document.cookie.indexOf(";", cSIndex + (name + "=").length);
+                if (cEIndex == -1) {
+                    cEIndex = document.cookie.length;
+                }
+                return document.cookie.substring(cSIndex + (name + "=").length, cEIndex);
+            }
+
+            var parts = getCookie('data').split('|');
+            addList(parts[0], false);
+            if (parts.length > 1) {
+                addList(parts[1], true);
+            }
+        }
+
+        function moveTask(li, isComplete) {//удаление элемента
+            var containner = isComplete ? '#list-ready' : '#list-not-ready';
+            li.appendTo(containner);
+            saveState();
+        }
+
+        function addTask(val, isComplete) {//генерация нового элемента
+
+            var span = $('<span />').text(val);
+            var del = $('<a class="del" href="#" />').text('delete');
+            var li = $('<li class="task" />').append(del).append(span);
+            del.click(function () {
+                li.remove();
+                saveState();
+                return false;
+            });
+            moveTask(li, isComplete);
+        }
+
+        $(function () {// добавление нового элемента
+            $('#btn-enter').click(function () {
+                var val = $('#new-todo').val();
+                if (val) {
+                    addTask(val);
+                    $('#new-todo').val('');
+                }
+                return false;
+            });
+
+            $('#new-todo').keypress(function (e) {
+                if (e.keyCode == 13) {
+                    $('#btn-enter').click();
+                }
+            });
+            loadState();
+        });
+    </script>
+
+</head>
+<body>
+<div id="main">
+    <div>
+        <input id="new-todo" placeholder="your new task" />
+        <a id="btn-enter" class="btn-common" href="#">ADD</a>
+    </div>
+    <div>
+        <ol id="list-not-ready">
+        </ol>
+    </div>
+</div>
+</body>
+</html>
