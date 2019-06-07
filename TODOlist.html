@@ -29,7 +29,7 @@
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.6.min.js"></script>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/jquery-ui.min.js"></script>
     <script type="text/javascript">
-        function saveState() {
+        function saveState() {//сохранение задачи
             var notReady = [];
             var ready = [];
 
@@ -40,14 +40,14 @@
             var result = notReady.join('&') + '|' + ready.join('&');
             var time = new Date();
             time.setTime(time.getTime() + 2678400000);
-            document.cookie = 'data=' + result + "; expires=" + time.toGMTString();
+            document.cookie = 'data=' + result + "; expires=" + time.toGMTString();//запись новой куки
         }
 
-        function loadState() {
+        function loadState() {// загрузка списка
             var addList = function (strList, isComplete) {
                 var list = strList.split('&');
                 for (var i = 0; i < list.length; i++) {
-                    if (list[i]) {
+                    if (list[i]) {//добавление задачи
                         addTask(unescape(list[i]), isComplete);
                     }
                 }
@@ -77,7 +77,7 @@
             }
         }
 
-        function moveTask(li, isComplete) {//удаление элемента
+        function moveTask(li, isComplete) {//вывод задачи
             var containner = isComplete ? '#list-ready' : '#list-not-ready';
             li.appendTo(containner);
             saveState();
@@ -90,10 +90,10 @@
             var li = $('<li class="task" />').append(del).append(span);
             del.click(function () {
                 li.remove();
-                saveState();
+                saveState();//сохранение
                 return false;
             });
-            moveTask(li, isComplete);
+            moveTask(li, isComplete); //
         }
 
         $(function () {// добавление нового элемента
@@ -106,7 +106,7 @@
                 return false;
             });
 
-            $('#new-todo').keypress(function (e) {
+            $('#new-todo').keypress(function (e) {// отсдеживание кнопки
                 if (e.keyCode == 13) {
                     $('#btn-enter').click();
                 }
